@@ -5,14 +5,11 @@ const app = express();
 const PORT = 8080;
 const library = require('./library');
 
-app.use( express.json() )
+app.use(express.json());
 
 app.post('/', async (req, res) => {
-    const userInput = req.body.author_name
-    res.send(await library.searchByAuthor(userInput))
+    const userInput = req.body.author_name;
+    res.send(await library.searchByAuthor(userInput));
 });
 
-app.listen(
-    PORT,
-    () => console.log(`Server Started`)
-)
+app.listen(PORT, () => console.log(`Server Started`));
