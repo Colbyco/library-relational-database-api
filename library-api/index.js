@@ -2,15 +2,29 @@ require('dotenv').config();
 // const axios = require('axios');
 const express = require('express');
 const app = express();
-const PORT = 8080;
+const PORT = 3000;
 const library = require('./library');
 const ah = require('express-async-handler');
 
 app.use(express.json());
 
+// User Registeration
+app.post('/register', async (req, res) => {
+    // True = successful registration, False = Failed registration
+    return res.send(await library.registerUser(req.body.username, req.body.password, req.body.email));
+});
+
+app.post('/login', async (req, res) => {
+    // True = Successful login, False = Incorrect info
+    const login = await library.loginUser(req.body.username, req.body.password);
+    return res.send(login);
+});
+
+//
+
 // Create
 
-// POST - Author - /author/ - Creates an author with the given name
+// POST - Author - /author - Creates an author with the given name
 app.post(
     '/author',
     ah(async (req, res) => {
@@ -20,13 +34,39 @@ app.post(
 
 // POST - Book - /book/ - Creates a book with the given name, author_id, published_date, owned, or on_hand
 app.post(
-    '/book/',
+    '/book',
     ah(async (req, res) => {
         return res.send(await library.createBook(req.body));
     }),
 );
 
 // Read
+
+// GET - Book - /books/{author_name}
+app.get(
+    '/books/author/:authorName',
+    ah(async (req, res) => {
+        const query = await library.getBooksByAuthor(req.params.authorName);
+
+        if (query.length) {
+            return res.send(query);
+        }
+        return res.sendStatus(404);
+    }),
+);
+
+// GET - Book - /books/{title}
+app.get(
+    '/books/:title',
+    ah(async (req, res) => {
+        const query = await library.getBooksByTitle(req.params.title);
+
+        if (query.length) {
+            return res.send(query);
+        }
+        return res.sendStatus(404);
+    }),
+);
 
 // GET - Author - /authors - return the entire authors table
 app.get(
